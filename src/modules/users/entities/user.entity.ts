@@ -25,7 +25,7 @@ export class User {
   @Column()
   password: string;
 
-  @OneToMany(() => Task, (tasks) => tasks.user_id)
+  @OneToMany(() => Task, (tasks) => tasks.userId)
   tasks: Task[];
 
   @CreateDateColumn()
