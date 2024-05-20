@@ -144,10 +144,62 @@ $ curl -X POST http://localhost:3000/api/tasks \
 $ curl -X GET http://localhost:3000/api/tasks/user123
 ```
 
-#### Real-Time Updates
+## Real-Time Updates - WebSocket Events for Task Management
 
 To receive real-time updates on task changes, connect to the WebSocket endpoint provided by the server. 
 This feature allows users to get immediate updates on their tasks without needing to refresh or poll the server.
+
+### Events
+
+**1. createUser**
+
+- Trigger: Client sends a message with the event name createUser and a payload containing a CreateUserDto object 
+
+```json
+{
+  "email": "example@example.com",
+  "username": "example",
+  "fullname": "example",
+  "password": "12345" 
+}
+```
+- Response: Upon successful creation, the server emits the userCreated event back to the client 
+with the newly created User data as the payload.
+
+**2. createTask**
+
+- Trigger: Client sends a message with the event name createTask and a payload containing a CreateTaskDto object 
+
+```json
+{
+  "title": "Example Task",
+  "description": "Task One",
+  "status": "completed",
+   
+}
+```
+- Response: Upon successful creation, the server emits the taskCreated event back to the client 
+with the newly created task data as the payload.
+
+**3. updateTask**
+
+- Trigger:Client sends a message with the event name updateTask and a payload containing an object with two properties:
+
+1.  taskId: The ID of the task to be updated (string)
+2. updateTaskDto: An object containing the updated task data following the UpdateTaskDto format
+
+```json
+{
+  "taskId": "string",
+  "updateTaskDto":{
+    "title": "Example Task",
+    "description": "Task One",
+    "status": "completed",
+  } 
+}
+```
+- Response: Similar to createTask, the server emits the taskUpdated event back to the client with the updated task data as the payload.
+
 
 ###### Author
 
