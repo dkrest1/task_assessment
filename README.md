@@ -153,10 +153,4 @@ This feature allows users to get immediate updates on their tasks without needin
 
 Oluwatosin Akande
 
-- **GitHub Profile**
-
-[GitHub](https://github.com/dkrest1)
-
-- **LinkedIn**
-
-[LinkedIn](https://www.linkedin.com/in/oluwatosin-akande1)
+[GitHub Profile](https://github.com/dkrest1) | [LinkedIn Profile](https://www.linkedin.com/in/oluwatosin-akande1)
