@@ -34,14 +34,13 @@ export class UsersService {
   }
 
   async findOne(userId: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({
-      id: userId,
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
     });
 
     if (!user || user === null) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    delete user.password;
     return user;
   }
 
@@ -60,8 +59,8 @@ export class UsersService {
   }
 
   async update(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.userRepository.findOneBy({
-      id: userId,
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
     });
 
     if (!user || user === null) {
@@ -73,13 +72,12 @@ export class UsersService {
     };
 
     const updatedUser = await this.userRepository.save(userToUpdate);
-    delete updatedUser.password;
     return updatedUser;
   }
 
   async delete(userId: string): Promise<string> {
-    const user = await this.userRepository.findOneBy({
-      id: userId,
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
     });
 
     if (!user || user === null) {

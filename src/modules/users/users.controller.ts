@@ -6,11 +6,18 @@ import {
   Delete,
   UseGuards,
   HttpStatus,
-  Request,
+  ParseUUIDPipe,
+  Param,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-guard.guard';
 import { APIResponseI } from '../common/interfaces/general.interface';
 
@@ -20,14 +27,35 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Find a User' })
   @ApiResponse({
     status: 200,
-    description: 'Success',
+    description: 'Find a User',
+    schema: {
+      example: {
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        payload: {
+          id: '123',
+          email: 'example@example.com',
+          username: 'example',
+          fullname: 'example example',
+          created_at: '2024-05-20T01:48:56.375Z',
+          updated_at: '2024-05-20T01:48:56.375Z',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @Get('me')
-  async findOne(@Request() req: any): Promise<APIResponseI> {
-    const userId = req.user.id;
+  @ApiParam({ name: 'userId' })
+  @Get(':userId')
+  async findOne(
+    @Param(
+      'userId',
+      new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    userId: string,
+  ): Promise<APIResponseI> {
     const response = await this.usersService.findOne(userId);
 
     return {
@@ -38,18 +66,37 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update a User' })
   @ApiResponse({
     status: 200,
-    description: 'The User has successfully been updated.',
+    description: 'Update a User',
+    schema: {
+      example: {
+        statusCode: HttpStatus.OK,
+        message: 'Success',
+        payload: {
+          id: '123',
+          email: 'example@example.com',
+          username: 'example',
+          fullname: 'example example',
+          created_at: '2024-05-20T01:48:56.375Z',
+          updated_at: '2024-05-20T01:48:56.375Z',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiParam({ name: 'userId' })
   @ApiBody({ type: [UpdateUserDto] })
-  @Patch('me')
+  @Patch(':userId')
   async update(
-    @Request() req: any,
+    @Param(
+      'userId',
+      new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    userId: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<APIResponseI> {
-    const userId = req.user.id;
     const response = await this.usersService.update(userId, updateUserDto);
 
     return {
@@ -60,14 +107,28 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Delete a User' })
   @ApiResponse({
     status: 200,
-    description: 'User deleted successfully',
+    description: 'Delete a User',
+    schema: {
+      example: {
+        statusCode: HttpStatus.OK,
+        message: 'User deleted successfully',
+        payload: null,
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @Delete('me')
-  async delete(@Request() req: any) {
-    const userId = req.user.id;
+  @ApiParam({ name: 'userId' })
+  @Delete(':userId')
+  async delete(
+    @Param(
+      'userId',
+      new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    userId: string,
+  ) {
     const response = await this.usersService.delete(userId);
 
     return {

@@ -7,15 +7,22 @@ import {
   SwaggerDocumentOptions,
   SwaggerModule,
 } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Task Management APIs')
     .setDescription(
-      'Task Management API - NIYO Group Assessment. Users can create, read, update, and delete tasks. Authentication is implemented to manage user access, allowing users to manage their tasks effectively.',
+      'Task Management API - NIYO Group Assessment. Users can create, read, update, and delete tasks. Authentication is implemented using Passport and Authorization with Passport JWT, allowing users to manage their tasks effectively.',
     )
     .setVersion('1.0')
     .build();
