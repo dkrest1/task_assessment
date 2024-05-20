@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
 import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from '../auth/strategies/jwt.strategy';
+import { TasksGateway } from './tasks.gateway';
 @Module({
   imports: [UsersModule, TypeOrmModule.forFeature([Task])],
   controllers: [TasksController],
-  providers: [TasksService, JwtStrategy],
+  providers: [TasksService, JwtStrategy, TasksGateway],
   exports: [TasksService],
 })
 export class TasksModule {}

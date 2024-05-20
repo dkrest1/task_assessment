@@ -1,4 +1,23 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateTaskDto } from './create-task.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class UpdateTaskDto extends PartialType(CreateTaskDto) {}
+export class UpdateTaskDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  title: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  @IsIn(['pending', 'inProgress', 'completed'])
+  status: string;
+}
