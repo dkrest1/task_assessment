@@ -14,8 +14,8 @@ import { UsersService } from '../users/users.service';
 import { localAuthGuard } from './guards/local-auth.guard';
 import { APIResponseI } from '../common/interfaces/general.interface';
 
-@ApiTags('api/auth')
-@Controller('auth')
+@ApiTags('auth')
+@Controller('api/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -32,7 +32,7 @@ export class AuthController {
   async create(@Body() createAuthDto: CreateAuthDto): Promise<APIResponseI> {
     const user = await this.authService.create(createAuthDto);
     return {
-      status: HttpStatus.CREATED,
+      statusCode: HttpStatus.CREATED,
       message: 'Created Successfully',
       payload: user,
     };
@@ -49,7 +49,7 @@ export class AuthController {
   async login(@Request() req: any): Promise<APIResponseI> {
     const response = await this.authService.login(req.user);
     return {
-      status: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
       message: 'Success',
       payload: response,
     };

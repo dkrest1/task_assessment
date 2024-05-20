@@ -17,10 +17,17 @@ import {
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { ApiBody, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-guard.guard';
 import { APIResponseI } from '../common/interfaces/general.interface';
 
+@ApiTags('tasks')
 @Controller('api/tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
@@ -40,35 +47,8 @@ export class TasksController {
   ): Promise<APIResponseI> {
     const response = await this.tasksService.create(req.user.id, createTaskDto);
     return {
-      status: HttpStatus.CREATED,
+      statusCode: HttpStatus.CREATED,
       message: 'Task created successfully',
-      payload: response,
-    };
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @ApiResponse({
-    status: 200,
-    description: 'Success',
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiQuery({
-    name: 'page',
-    description: 'page number',
-  })
-  @ApiQuery({
-    name: 'limit',
-    description: 'the number of task per page',
-  })
-  @Get()
-  async findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-  ): Promise<APIResponseI> {
-    const response = await this.tasksService.findAll(page, limit);
-    return {
-      status: HttpStatus.OK,
-      message: 'Success',
       payload: response,
     };
   }
@@ -91,7 +71,7 @@ export class TasksController {
     const response = await this.tasksService.findOne(taskId);
 
     return {
-      status: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
       message: 'Success',
       payload: response,
     };
@@ -103,14 +83,29 @@ export class TasksController {
     description: 'Success ',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiParam({ name: 'me' })
-  @Get('me')
-  async findUserTasks(@Request() req: any): Promise<APIResponseI> {
-    const userId = req.user.id;
-    const response = await this.tasksService.findUserTasks(userId);
+  @ApiParam({ name: 'userId' })
+  @ApiQuery({
+    name: 'page',
+    description: 'page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: 'the number of task per page',
+  })
+  @Get('users/:userId')
+  async findUserTasks(
+    @Param(
+      'userId',
+      new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    userId: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<APIResponseI> {
+    const response = await this.tasksService.findUserTasks(userId, page, limit);
 
     return {
-      status: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
       message: 'Success',
       payload: response,
     };
@@ -122,26 +117,30 @@ export class TasksController {
     description: 'Task updated successfully.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'taskId' })
+  @ApiParam({ name: 'userId' })
   @ApiBody({ type: [UpdateTaskDto] })
-  @Patch(':taskId/me')
+  @Patch(':taskId/users/:userId')
   async update(
     @Param(
       'taskId',
       new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     taskId: string,
-    @Request() req: any,
+    @Param(
+      'userId',
+      new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    userId: string,
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<APIResponseI> {
-    const userId: string = req.user.id;
     const response = await this.tasksService.update(
       userId,
       taskId,
       updateTaskDto,
     );
     return {
-      status: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
       message: 'Task updated successfully',
       payload: response,
     };
@@ -153,21 +152,25 @@ export class TasksController {
     description: 'Task deleted successfully.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiParam({ name: 'TaskId' })
-  @Delete(':taskId/me')
+  @ApiParam({ name: 'taskId' })
+  @ApiParam({ name: 'userId' })
+  @Delete(':taskId/users/:userId')
   async delete(
     @Param(
       'taskId',
       new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     taskId: string,
-    @Request() req: any,
+    @Param(
+      'userId',
+      new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    userId: string,
   ): Promise<APIResponseI> {
-    const userId: string = req.user.id;
     const response = await this.tasksService.delete(userId, taskId);
 
     return {
-      status: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
       message: response,
       payload: null,
     };

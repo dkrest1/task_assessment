@@ -15,10 +15,9 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Task Management APIs')
     .setDescription(
-      'Task Management API for a Task Assessment App. Users can create, read, update, and delete tasks. Authentication is implemented to manage user access and roles, allowing users to manage their tasks effectively.',
+      'Task Management API - NIYO Group Assessment. Users can create, read, update, and delete tasks. Authentication is implemented to manage user access, allowing users to manage their tasks effectively.',
     )
     .setVersion('1.0')
-    .addTag('task')
     .build();
   const options: SwaggerDocumentOptions = {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,

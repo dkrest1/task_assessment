@@ -15,56 +15,45 @@ export class TasksService {
   ) {}
 
   async create(userId: string, createTaskDto: CreateTaskDto): Promise<Task> {
-    try {
-      const user = await this.usersService.findOne(userId);
-      const newTask = await this.taskRepository.save(
-        this.taskRepository.create({ ...createTaskDto, userId: user }),
-      );
-      return newTask;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
-  async findAll(page: number, limit: number): Promise<Task[]> {
-    try {
-      const tasks = await this.taskRepository.find({
-        skip: (page - 1) * limit,
-        take: limit,
-        relations: ['userId'],
-      });
-      return tasks;
-    } catch (error) {
-      throw new Error(error);
-    }
+    const user = await this.usersService.findOne(userId);
+    const newTask = await this.taskRepository.save(
+      this.taskRepository.create({ ...createTaskDto, userId: user }),
+    );
+    return newTask;
   }
 
   async findOne(taskId: string): Promise<Task> {
-    try {
-      const task = await this.taskRepository.findOneBy({ id: taskId });
-      if (!task || task === null) {
-        throw new HttpException('task does not exist', HttpStatus.NOT_FOUND);
-      }
-      return task;
-    } catch (error) {
-      throw new Error(error);
+    const task = await this.taskRepository.findOne({
+      where: { id: taskId },
+      relations: ['userId'],
+    });
+    if (!task || task === null) {
+      throw new HttpException('task does not exist', HttpStatus.NOT_FOUND);
     }
+    delete task.userId.password;
+    return task;
   }
 
-  async findUserTasks(userId: string): Promise<Task[]> {
-    try {
-      const user = await this.usersService.findOne(userId);
-      const tasks = await this.taskRepository.find({
-        where: { userId: user },
-      });
-      if (!tasks || tasks.length === 0) {
-        throw new HttpException('Tasks do not exist', HttpStatus.NOT_FOUND);
-      }
+  async findUserTasks(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<Task[]> {
+    const user = await this.usersService.findOne(userId);
 
-      return tasks;
-    } catch (error) {
-      throw new Error(error);
+    const tasks = await this.taskRepository
+      .createQueryBuilder('tasks')
+      .leftJoinAndSelect('tasks.userId', 'userId')
+      .where('tasks.userId = :userId', { userId: user.id })
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany();
+
+    if (tasks.length === 0) {
+      throw new HttpException('Tasks do not exist', HttpStatus.NOT_FOUND);
     }
+
+    return tasks;
   }
 
   async update(
@@ -72,50 +61,34 @@ export class TasksService {
     taskId: string,
     updateTaskDto: UpdateTaskDto,
   ): Promise<Task> {
+    const user = await this.usersService.findOne(userId);
+
     const task = await this.taskRepository
-      .createQueryBuilder('task')
-      .leftJoinAndSelect('task.user', 'user')
-      .where(`task.id = :postId`, { taskId })
+      .createQueryBuilder('tasks')
+      .leftJoinAndSelect('tasks.userId', 'userId')
+      .where('tasks.id = :taskId', { taskId })
+      .andWhere('tasks.userId = :userId', { userId: user.id })
       .getOne();
 
-    try {
-      if (task.userId.id !== userId) {
-        throw new HttpException(
-          'user with task does not exist',
-          HttpStatus.NOT_ACCEPTABLE,
-        );
-      }
-      const PostToUpdate = { ...task, ...updateTaskDto };
-      const updatedPost = await this.taskRepository.save(PostToUpdate);
-      delete updatedPost.userId.password;
-      return updatedPost;
-    } catch (error) {
-      throw new Error(error);
-    }
+    const taskToUpdate = { ...task, ...updateTaskDto };
+    const updatedPost = await this.taskRepository.save(taskToUpdate);
+    return updatedPost;
   }
 
   async delete(userId: string, taskId: string): Promise<string> {
-    try {
-      const task = await this.taskRepository
-        .createQueryBuilder('tasks')
-        .leftJoinAndSelect('tasks.userId', 'userId')
-        .where(`tasks.id  = :id`, { taskId })
-        .getOne();
+    const user = await this.usersService.findOne(userId);
 
-      if (!task.userId || task.userId === null || task.userId.id !== userId) {
-        throw new HttpException(
-          'user with task does not exit',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+    const task = await this.taskRepository
+      .createQueryBuilder('tasks')
+      .leftJoinAndSelect('tasks.userId', 'userId')
+      .where('tasks.id = :taskId', { taskId })
+      .andWhere('tasks.userId = :userId', { userId: user.id })
+      .getOne();
 
-      if (task === null || !task) {
-        throw new HttpException('task does not exist', HttpStatus.NOT_FOUND);
-      }
-      await this.taskRepository.delete(taskId);
-      return `Task deleted successfully`;
-    } catch (error) {
-      throw new Error(error);
+    if (!task || task === null) {
+      throw new HttpException('task does not exist', HttpStatus.NOT_FOUND);
     }
+    await this.taskRepository.delete(taskId);
+    return `Task deleted successfully`;
   }
 }

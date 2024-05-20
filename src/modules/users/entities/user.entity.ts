@@ -22,7 +22,7 @@ export class User {
   @Column()
   fullname: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @OneToMany(() => Task, (tasks) => tasks.userId)

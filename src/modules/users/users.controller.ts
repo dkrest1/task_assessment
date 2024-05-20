@@ -7,47 +7,17 @@ import {
   UseGuards,
   HttpStatus,
   Request,
-  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-guard.guard';
 import { APIResponseI } from '../common/interfaces/general.interface';
 
+@ApiTags('users')
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @UseGuards(JwtAuthGuard)
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    description: 'pages number',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    description: 'limit per page',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Success',
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @Get()
-  async findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-  ): Promise<APIResponseI> {
-    const response = await this.usersService.findAll(page, limit);
-
-    return {
-      status: HttpStatus.OK,
-      message: 'Success',
-      payload: response,
-    };
-  }
 
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
@@ -61,7 +31,7 @@ export class UsersController {
     const response = await this.usersService.findOne(userId);
 
     return {
-      status: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
       message: 'Success',
       payload: response,
     };
@@ -83,7 +53,7 @@ export class UsersController {
     const response = await this.usersService.update(userId, updateUserDto);
 
     return {
-      status: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
       message: 'Success',
       payload: response,
     };

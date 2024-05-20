@@ -16,46 +16,34 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
-    try {
-      const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
 
-      if (!user || !(await comparePassword(password, user.password))) {
-        throw new BadRequestException('Invalid Credentials');
-      }
-      if (user && (await comparePassword(password, user.password))) {
-        // delete password before returning user
-        delete user.password;
-        return user;
-      }
-      return null;
-    } catch (error) {
-      throw new Error(error);
+    if (!user || !(await comparePassword(password, user.password))) {
+      throw new BadRequestException('Invalid Credentials');
     }
+    if (user && (await comparePassword(password, user.password))) {
+      // delete password before returning user
+      delete user.password;
+      return user;
+    }
+    return null;
   }
 
   async create(createAuthDto: CreateAuthDto): Promise<User> {
-    try {
-      const user = await this.usersService.create(createAuthDto);
-      return user;
-    } catch (error) {
-      throw new Error(error);
-    }
+    const user = await this.usersService.create(createAuthDto);
+    return user;
   }
 
   async login(user: User): Promise<LoginResponseI> {
-    try {
-      const payload = {
-        sub: user.id,
-        email: user.email,
-      };
-      const access_token = await this.jwtService.signAsync(payload);
-      const response = {
-        user,
-        access_token,
-      };
-      return response;
-    } catch (error) {
-      throw new Error(error);
-    }
+    const payload = {
+      sub: user.id,
+      email: user.email,
+    };
+    const access_token = await this.jwtService.signAsync(payload);
+    const response = {
+      user,
+      access_token,
+    };
+    return response;
   }
 }

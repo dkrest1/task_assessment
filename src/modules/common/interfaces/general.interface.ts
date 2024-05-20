@@ -1,5 +1,5 @@
 export interface APIResponseI {
-  status: number;
+  statusCode: number;
   message: string;
   payload: any;
 }
