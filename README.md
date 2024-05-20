@@ -1,4 +1,4 @@
-# Task Management API - NIYO Group Assessment
+# Task Management API Assessment
 
 ## Description
 
@@ -29,7 +29,7 @@ while maintaining data privacy and integrity.
 
 ```bash
 $ git clone repo url
-$ cd niyo_group_assessment
+$ cd task_assessment
 ```
 
 2. Create a `.env`file and put in the right credentials:
@@ -153,7 +153,7 @@ This feature allows users to get immediate updates on their tasks without needin
 
 **1. createUser**
 
-- Trigger: Client sends a message with the event name createUser and a payload containing a CreateUserDto object 
+- Trigger: Client sends a message with the event name `createUser` and a payload containing a CreateUserDto object 
 
 ```json
 {
@@ -163,12 +163,12 @@ This feature allows users to get immediate updates on their tasks without needin
   "password": "12345" 
 }
 ```
-- Response: Upon successful creation, the server emits the userCreated event back to the client 
+- Response: Upon successful creation, the server emits the `userCreated` event back to the client 
 with the newly created User data as the payload.
 
 **2. createTask**
 
-- Trigger: Client sends a message with the event name createTask and a payload containing a CreateTaskDto object 
+- Trigger: Client sends a message with the event name `createTask` and a payload containing a CreateTaskDto object 
 
 ```json
 {
@@ -178,12 +178,12 @@ with the newly created User data as the payload.
    
 }
 ```
-- Response: Upon successful creation, the server emits the taskCreated event back to the client 
+- Response: Upon successful creation, the server emits the `taskCreated` event back to the client 
 with the newly created task data as the payload.
 
 **3. updateTask**
 
-- Trigger:Client sends a message with the event name updateTask and a payload containing an object with two properties:
+- Trigger:Client sends a message with the event name `updateTask` and a payload containing an object with two properties:
 
 1.  taskId: The ID of the task to be updated (string)
 2. updateTaskDto: An object containing the updated task data following the UpdateTaskDto format
@@ -198,7 +198,7 @@ with the newly created task data as the payload.
   } 
 }
 ```
-- Response: Similar to createTask, the server emits the taskUpdated event back to the client with the updated task data as the payload.
+- Response: Similar to createTask, the server emits the `taskUpdated` event back to the client with the updated task data as the payload.
 
 
 ###### Author
