@@ -29,7 +29,7 @@ while maintaining data privacy and integrity.
 
 ```bash
 $ git clone repo url
-$ cd niyo_assessment
+$ cd niyo_group_assessment
 ```
 
 2. Create a `.env`file and put in the right credentials:
